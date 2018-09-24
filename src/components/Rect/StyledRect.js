@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import React from 'react'
 
 export default styled.div`
   position: absolute;
@@ -7,8 +6,8 @@ export default styled.div`
 
   .square {
     position: absolute;
-    width: 7px;
-    height: 7px;
+    width: 0.5em;
+    height: 0.5em;
     background: white;
     border: 1px solid #eb5648;
     border-radius: 1px;
@@ -60,7 +59,7 @@ export default styled.div`
     position: absolute;
     cursor: pointer;
     left: 50%;
-    top: -26px;
+    top: -40px;
     transform: translateX(-50%);
 
     & i {
@@ -78,36 +77,36 @@ export default styled.div`
   .t,
   .tl,
   .tr {
-    top: -3px;
+    top: -6px;
   }
 
   .b,
   .bl,
   .br {
-    bottom: -3px;
+    bottom: -6px;
   }
 
   .r,
   .tr,
   .br {
-    right: -3px;
+    right: -6px;
   }
 
   .tl,
   .l,
   .bl {
-    left: -3px;
+    left: -6px;
   }
 
   .l,
   .r {
     top: 50%;
-    margin-top: -3px;
+    margin-top: -6px;
   }
 
   .t,
   .b {
     left: 50%;
-    margin-left: -3px;
+    margin-left: -6px;
   }
 `

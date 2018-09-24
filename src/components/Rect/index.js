@@ -35,13 +35,15 @@ export default class Rect extends PureComponent {
 
   // Drag
   startDrag = (e) => {
-    var { clientX: startX, clientY: startY } = e
+    var startX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
+    var startY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
     this.props.onDragStart && this.props.onDragStart()
     this._isMouseDown = true
     const onMove = (e) => {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
       e.stopImmediatePropagation()
-      const { clientX, clientY } = e
+      const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
+      const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
       const deltaX = clientX - startX
       const deltaY = clientY - startY
       this.props.onDrag(deltaX, deltaY)
@@ -51,18 +53,24 @@ export default class Rect extends PureComponent {
     const onUp = () => {
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
+      document.removeEventListener('touchmove', onMove)
+      document.removeEventListener('touchend', onUp)
       if (!this._isMouseDown) return
       this._isMouseDown = false
       this.props.onDragEnd && this.props.onDragEnd()
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
+    document.addEventListener('touchmove', onMove)
+    document.addEventListener('touchend', onUp)
   }
 
   // Rotate
   startRotate = (e) => {
-    if (e.button !== 0) return
-    const { clientX, clientY } = e
+    //if (e.button !== 0) return
+    const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
+    const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
+
     const { styles: { transform: { rotateAngle: startAngle } } } = this.props
     const rect = this.$element.getBoundingClientRect()
     const center = {
@@ -78,7 +86,8 @@ export default class Rect extends PureComponent {
     const onMove = (e) => {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
       e.stopImmediatePropagation()
-      const { clientX, clientY } = e
+     const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
+     const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
       const rotateVector = {
         x: clientX - center.x,
         y: clientY - center.y
@@ -89,20 +98,25 @@ export default class Rect extends PureComponent {
     const onUp = () => {
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
+      document.removeEventListener('touchmove', onMove)
+      document.removeEventListener('touchend', onUp)
       if (!this._isMouseDown) return
       this._isMouseDown = false
       this.props.onRotateEnd && this.props.onRotateEnd()
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
+    document.addEventListener('touchmove', onMove)
+    document.addEventListener('touchend', onUp)
   }
 
   // Resize
   startResize = (e, cursor) => {
-    if (e.button !== 0) return
+   // if (e.button !== 0) return
     document.body.style.cursor = cursor
     const { styles: { position: { centerX, centerY }, size: { width, height }, transform: { rotateAngle } } } = this.props
-    const { clientX: startX, clientY: startY } = e
+    const startX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
+    const startY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
     const rect = { width, height, centerX, centerY, rotateAngle }
     const type = e.target.getAttribute('class').split(' ')[0]
     this.props.onResizeStart && this.props.onResizeStart()
@@ -110,7 +124,8 @@ export default class Rect extends PureComponent {
     const onMove = (e) => {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
       e.stopImmediatePropagation()
-      const { clientX, clientY } = e
+      const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
+      const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
       const deltaX = clientX - startX
       const deltaY = clientY - startY
       const alpha = Math.atan2(deltaY, deltaX)
@@ -123,12 +138,17 @@ export default class Rect extends PureComponent {
       document.body.style.cursor = 'auto'
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
+      document.removeEventListener('touchmove', onMove)
+      document.removeEventListener('touchend', onUp)
+
       if (!this._isMouseDown) return
       this._isMouseDown = false
       this.props.onResizeEnd && this.props.onResizeEnd()
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
+    document.addEventListener('touchmove', onMove)
+    document.addEventListener('touchend', onUp)
   }
 
   render () {
@@ -141,14 +161,15 @@ export default class Rect extends PureComponent {
       <StyledRect
         innerRef={this.setElementRef}
         onMouseDown={this.startDrag}
+        onTouchStart={this.startDrag}
         className="rect single-resizer"
         style={style}
       >
-        {rotatable && <div className="rotate" onMouseDown={this.startRotate}><i></i></div>}
+        {rotatable && <div className="rotate" onMouseDown={this.startRotate} onTouchStart={this.startRotate}><i></i></div>}
         {direction.map(d => {
           const cursor = `${getCursor(rotateAngle + parentRotateAngle, d)}-resize`
           return (
-            <div key={d} style={{ cursor }} className={`${zoomableMap[d]} resizable-handler`} onMouseDown={(e) => this.startResize(e, cursor)}></div>
+            <div key={d} style={{ cursor }} className={`${zoomableMap[d]} resizable-handler`} onMouseDown={(e) => this.startResize(e, cursor)} onTouchStart={(e) => this.startResize(e, cursor)}></div>
           )
         })}
         {direction.map(d => {
