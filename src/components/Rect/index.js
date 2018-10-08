@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { getLength, getAngle, getCursor } from '../../utils'
-import StyledRect from './StyledRect'
+import StyledRect from './StyledRect.Touch'
 
 const zoomableMap = {
   'n': 't',
@@ -35,13 +35,16 @@ export default class Rect extends PureComponent {
 
   // Drag
   startDrag = (e) => {
+    e.preventDefault && e.preventDefault();
+    e.stopImmediatePropagation && e.stopImmediatePropagation()
     var startX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
     var startY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
     this.props.onDragStart && this.props.onDragStart()
     this._isMouseDown = true
     const onMove = (e) => {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
-      e.stopImmediatePropagation()
+      e.preventDefault && e.preventDefault();
+      e.stopImmediatePropagation && e.stopImmediatePropagation()
       const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
       const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
       const deltaX = clientX - startX
@@ -53,16 +56,16 @@ export default class Rect extends PureComponent {
     const onUp = () => {
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
-      document.removeEventListener('touchmove', onMove)
-      document.removeEventListener('touchend', onUp)
+      document.removeEventListener('touchmove', onMove, {passive:false})
+      document.removeEventListener('touchend', onUp, {passive:false})
       if (!this._isMouseDown) return
       this._isMouseDown = false
       this.props.onDragEnd && this.props.onDragEnd()
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
-    document.addEventListener('touchmove', onMove)
-    document.addEventListener('touchend', onUp)
+    document.addEventListener('touchmove', onMove, {passive:false})
+    document.addEventListener('touchend', onUp, {passive:false})
   }
 
   // Rotate
@@ -85,7 +88,8 @@ export default class Rect extends PureComponent {
     this._isMouseDown = true
     const onMove = (e) => {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
-      e.stopImmediatePropagation()
+      e.preventDefault && e.preventDefault();
+      e.stopPropagation && e.stopImmediatePropagation()
      const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
      const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
       const rotateVector = {
@@ -98,21 +102,23 @@ export default class Rect extends PureComponent {
     const onUp = () => {
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
-      document.removeEventListener('touchmove', onMove)
-      document.removeEventListener('touchend', onUp)
+      document.removeEventListener('touchmove', onMove, {passive:false})
+      document.removeEventListener('touchend', onUp, {passive:false})
       if (!this._isMouseDown) return
       this._isMouseDown = false
       this.props.onRotateEnd && this.props.onRotateEnd()
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
-    document.addEventListener('touchmove', onMove)
-    document.addEventListener('touchend', onUp)
+    document.addEventListener('touchmove', onMove, {passive:false})
+    document.addEventListener('touchend', onUp, {passive:false})
   }
 
   // Resize
   startResize = (e, cursor) => {
    // if (e.button !== 0) return
+   e.preventDefault && e.preventDefault();
+   e.stopImmediatePropagation && e.stopImmediatePropagation()
     document.body.style.cursor = cursor
     const { styles: { position: { centerX, centerY }, size: { width, height }, transform: { rotateAngle } } } = this.props
     const startX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
@@ -123,7 +129,8 @@ export default class Rect extends PureComponent {
     this._isMouseDown = true
     const onMove = (e) => {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
-      e.stopImmediatePropagation()
+      e.preventDefault && e.preventDefault();
+      e.stopImmediatePropagation && e.stopImmediatePropagation()
       const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
       const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
       const deltaX = clientX - startX
@@ -138,8 +145,8 @@ export default class Rect extends PureComponent {
       document.body.style.cursor = 'auto'
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
-      document.removeEventListener('touchmove', onMove)
-      document.removeEventListener('touchend', onUp)
+      document.removeEventListener('touchmove', onMove, {passive:false})
+      document.removeEventListener('touchend', onUp, {passive:false})
 
       if (!this._isMouseDown) return
       this._isMouseDown = false
@@ -147,8 +154,8 @@ export default class Rect extends PureComponent {
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
-    document.addEventListener('touchmove', onMove)
-    document.addEventListener('touchend', onUp)
+    document.addEventListener('touchmove', onMove, {passive:false})
+    document.addEventListener('touchend', onUp, {passive:false})
   }
 
   render () {

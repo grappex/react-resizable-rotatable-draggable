@@ -6,8 +6,8 @@ export default styled.div`
 
   .square {
     position: absolute;
-    width: 0.5em;
-    height: 0.5em;
+    width: 1em;
+    height: 1em;
     background: white;
     border: 1px solid #eb5648;
     border-radius: 1px;
@@ -15,21 +15,21 @@ export default styled.div`
 
   .resizable-handler {
     position: absolute;
-    width: 14px;
-    height: 14px;
+    width: 1.5em;
+    height: 1.5em;
     cursor: pointer;
     z-index: 1;
 
     &.tl,
     &.t,
     &.tr {
-      top: -7px;
+      top: -10px;
     }
 
     &.tl,
     &.l,
     &.bl {
-      left: -7px;
+      left: -10px;
     }
 
     &.bl,
