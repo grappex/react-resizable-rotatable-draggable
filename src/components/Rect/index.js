@@ -37,16 +37,16 @@ export default class Rect extends PureComponent {
   startDrag = (e) => {
     e.preventDefault && e.preventDefault();
     e.stopImmediatePropagation && e.stopImmediatePropagation()
-    var startX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
-    var startY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
+    var startX = this.isTouchEvent(e) ? e.touches[0].clientX: e.clientX ;
+    var startY = this.isTouchEvent(e) ? e.touches[0].clientY: e.clientY ;
     this.props.onDragStart && this.props.onDragStart()
     this._isMouseDown = true
     const onMove = (e) => {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
       e.preventDefault && e.preventDefault();
       e.stopImmediatePropagation && e.stopImmediatePropagation()
-      const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
-      const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
+      const clientX = this.isTouchEvent(e) ? e.touches[0].clientX: e.clientX ;
+      const clientY = this.isTouchEvent(e) ? e.touches[0].clientY: e.clientY ;
       const deltaX = clientX - startX
       const deltaY = clientY - startY
       this.props.onDrag(deltaX, deltaY)
@@ -71,8 +71,8 @@ export default class Rect extends PureComponent {
   // Rotate
   startRotate = (e) => {
     //if (e.button !== 0) return
-    const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
-    const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
+    const clientX = this.isTouchEvent(e) ? e.touches[0].clientX: e.clientX ;
+    const clientY = this.isTouchEvent(e) ? e.touches[0].clientY: e.clientY ;
 
     const { styles: { transform: { rotateAngle: startAngle } } } = this.props
     const rect = this.$element.getBoundingClientRect()
@@ -90,8 +90,8 @@ export default class Rect extends PureComponent {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
       e.preventDefault && e.preventDefault();
       e.stopPropagation && e.stopImmediatePropagation()
-     const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
-     const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
+     const clientX = this.isTouchEvent(e) ? e.touches[0].clientX: e.clientX ;
+     const clientY = this.isTouchEvent(e) ? e.touches[0].clientY: e.clientY ;
       const rotateVector = {
         x: clientX - center.x,
         y: clientY - center.y
@@ -114,6 +114,7 @@ export default class Rect extends PureComponent {
     document.addEventListener('touchend', onUp, {passive:false})
   }
 
+  isTouchEvent= (e) => typeof TouchEvent === 'function' && ((e instanceof TouchEvent) || e.nativeEvent instanceof TouchEvent)
   // Resize
   startResize = (e, cursor) => {
    // if (e.button !== 0) return
@@ -121,8 +122,8 @@ export default class Rect extends PureComponent {
    e.stopImmediatePropagation && e.stopImmediatePropagation()
     document.body.style.cursor = cursor
     const { styles: { position: { centerX, centerY }, size: { width, height }, transform: { rotateAngle } } } = this.props
-    const startX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
-    const startY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
+    const startX = this.isTouchEvent(e) ? e.touches[0].clientX: e.clientX ;
+    const startY = this.isTouchEvent(e) ? e.touches[0].clientY: e.clientY ;
     const rect = { width, height, centerX, centerY, rotateAngle }
     const type = e.target.getAttribute('class').split(' ')[0]
     this.props.onResizeStart && this.props.onResizeStart()
@@ -131,8 +132,8 @@ export default class Rect extends PureComponent {
       if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
       e.preventDefault && e.preventDefault();
       e.stopImmediatePropagation && e.stopImmediatePropagation()
-      const clientX = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientX: e.clientX ;
-      const clientY = e instanceof TouchEvent || e.nativeEvent instanceof TouchEvent ? e.touches[0].clientY: e.clientY ;
+      const clientX = this.isTouchEvent(e) ? e.touches[0].clientX: e.clientX ;
+      const clientY = this.isTouchEvent(e) ? e.touches[0].clientY: e.clientY ;
       const deltaX = clientX - startX
       const deltaY = clientY - startY
       const alpha = Math.atan2(deltaY, deltaX)
@@ -141,6 +142,7 @@ export default class Rect extends PureComponent {
       this.props.onResize(deltaL, alpha, rect, type, isShiftKey)
     }
 
+    
     const onUp = () => {
       document.body.style.cursor = 'auto'
       document.removeEventListener('mousemove', onMove)
